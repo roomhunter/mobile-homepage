@@ -3,8 +3,25 @@
 // generated on 2015-04-26 using generator-gulp-webapp 0.3.0
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
+var through = require('through2');
 var browserSync = require('browser-sync');
+var fs = require('fs');
 var reload = browserSync.reload;
+
+var rmOrig = function() {
+  return through.obj(function(file, enc, cb) {
+
+    if (file.revOrigPath) {
+      //log(colors.red('DELETING'), file.revOrigPath);
+      fs.unlink(file.revOrigPath, function(err) {
+        // TODO: emit an error if err
+      });
+    }
+
+    this.push(file); // Pass file when you're done
+    return cb() // notify through2 you're done
+  });
+};
 
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.css')
@@ -32,12 +49,12 @@ gulp.task('html', ['styles'], function () {
     .pipe(assets)
     .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.csso()))
-    .pipe($.rev())
+    //.pipe($.rev())
     // for html
     .pipe(assets.restore())
     .pipe($.useref())
     .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
-    .pipe($.revReplace())
+    //.pipe($.revReplace())
     .pipe(gulp.dest('dist'));
 });
 
@@ -50,7 +67,7 @@ gulp.task('images', function () {
       // as hooks for embedding and styling
       svgoPlugins: [{cleanupIDs: false}]
     })))
-    .pipe($.rev())
+    //.pipe($.rev())
     .pipe(gulp.dest('dist/images'));
 });
 
@@ -71,21 +88,25 @@ gulp.task('extras', function () {
   }).pipe(gulp.dest('dist'));
 });
 
-//gulp.task('revision', ['html', 'images'], function(){
-//  return gulp.src(['dist/styles/*.css', 'dist/scripts/*.js', 'dist/images/*.{jpg,png,jpeg}'])
-//    .pipe($.rev())
-//    .pipe(gulp.dest('dist'))
-//    .pipe($.rev.manifest())
-//    .pipe(gulp.dest('dist'))
-//});
-//
-//gulp.task("revreplace", ["revision"], function(){
-//  var manifest = gulp.src("./dist/rev-manifest.json");
-//
-//  return gulp.src('dist/index.html')
-//    .pipe($.revReplace({manifest: manifest}))
-//    .pipe(gulp.dest('dist'));
-//});
+gulp.task('revision', ['html', 'images'], function(){
+  return gulp.src(['dist/**/*.css', 'dist/**/*.js', 'dist/**/*.{jpg,jpeg,png}'])
+    .pipe($.rev())
+    //.pipe($.if('*.js'), gulp.dest('dist/scripts'))
+    //.pipe($.if('*.css'), gulp.dest('dist/styles'))
+    //.pipe($.if('*.{jpg,jpeg,png}'), gulp.dest('dist/images'))
+    .pipe(gulp.dest('dist'))
+    .pipe(rmOrig())
+    .pipe($.rev.manifest())
+    .pipe(gulp.dest('dist'))
+});
+
+gulp.task("revreplace", ["revision"], function(){
+  var manifest = gulp.src("dist/rev-manifest.json");
+
+  return gulp.src(['dist/index.html', 'dist/**/*.css'])
+    .pipe($.revReplace({manifest: manifest}))
+    .pipe(gulp.dest('dist'));
+});
 
 gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 
@@ -125,7 +146,7 @@ gulp.task('wiredep', function () {
     .pipe(gulp.dest('app'));
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras', 'revreplace'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
