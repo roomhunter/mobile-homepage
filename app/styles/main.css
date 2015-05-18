@@ -69,8 +69,8 @@ h1, h2, h3, h4, h5, h6 {
   height: 34px;
   width: 300px;
   overflow:hidden;
+  color: #555;
   /*background:url(../images/arrow.png) no-repeat 215px;*/
-  border:1px solid #ccc;
   -moz-border-radius: 5px; /* Gecko browsers */
   -webkit-border-radius: 5px; /* Webkit browsers */
   border-radius:2px;
