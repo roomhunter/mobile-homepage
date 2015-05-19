@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui">
-    <title>mobile homepage</title>
+    <title>Roomhunter</title>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="icon"  href="favicon.ico">
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Raleway:700,400,200' type='text/css'>
@@ -36,7 +36,7 @@
           <h3 class="text-light head-line">Find desirable apartments</h3>
           <div class="select_style select">
           <select  onchange="javascript:location.href=this.value;">
-            <option  selected="true" disabled="disabled" >I will go to...</option>
+            <option  selected="false"  >I will go to...</option>
             <option value="/app/#/list/columbia" >Columbia University</option>
             <option value="/app/#/list/nyu" >New York University</option>
             <option value="/app/#/list/fordham" >Fordham University</option>
@@ -49,16 +49,6 @@
           </select>
           </div>
         </div>
-        <script type="text/javascript">
-          $(function(){
-            var $body = $('body');
-            $body.on('change', 'select:has(option[href])', function(e) {
-              var _this = $(this),
-                _href = _this.find('option:selected').attr('href');//获取要跳转的地址
-              location.href = _href; //跳转
-            })
-          })
-        </script>
       </div>
       <div class="schools">
         <h2 class="schools-section-title">MOST POPULAR SCHOOLS</h2>
